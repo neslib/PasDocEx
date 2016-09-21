@@ -1,0 +1,21 @@
+Integration with Tipue (http://www.tipue.com/search/ ), version 3.0.1.
+
+Some of the files here are copied from Tipue sources (it's Ok to copy,
+MIT license). The tipuesearch.css needed some tiny modifications (see
+"PasDoc" comments inside).
+
+Our results page is called "_tipue_results.html" (we picked a name
+to avoid collisions with user unit name).
+
+These files are processed by programs file_to_pascal_string and
+file_to_pascal_data (in ../../tools/)
+and then their contents are included in PasDoc_Tipue unit.
+So all the needed tipue data is compiled inside pasdoc binary.
+This way you don't have to download and unpack tipue to use it with pasdoc
+--- Tipue data is inside PasDoc sources, and compiled inside PasDoc binary.
+As pasdoc can automatically generate tipue index data,
+users do not have to do (or even know) *anything* about tipue
+to use it with pasdoc. It's just a matter of passing --use-tipue-search.
+(we can't use tipue by default, without explicit request by --use-tipue-search
+option, since it's not suitable for really large documentation,
+see [http://pasdoc.sipsolutions.net/UseTipueSearchOption]).

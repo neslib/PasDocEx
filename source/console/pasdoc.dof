@@ -1,0 +1,4 @@
+[Directories]
+SearchPath=..\component;..\component\images;..\component\tipue
+DebugSourceDirs=..\component;..\Console;..\component\tipue
+OutputDir=
