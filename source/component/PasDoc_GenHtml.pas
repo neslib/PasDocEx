@@ -485,6 +485,8 @@ begin
     if not ExcludeGenerator then
     begin
       WriteConverted(FLanguage.Translation[trGeneratedBy] + ' ');
+      WriteLink('https://github.com/neslib/PasDocEx', 'PasDocEx', '');
+      WriteConverted(', based on ');
       WriteLink(PASDOC_HOMEPAGE, PASDOC_NAME_AND_VERSION, '');
       WriteConverted('. ');
     end;
