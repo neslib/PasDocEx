@@ -326,6 +326,66 @@ begin
   end;
 end;
 
+procedure HandleRaisesSection(var S: String; const SectionStart: Integer;
+  const Index: Integer);
+var
+  Text, Error, Errors, Line, Trimmed: String;
+  SectionEnd: Integer;
+  Lines: TStringList;
+
+  procedure ProcessError;
+  begin
+    if (Error <> '') then
+    begin
+      Errors := Errors + '@raises(' + Error + ')' + sLineBreak;
+      Error := '';
+    end;
+  end;
+
+begin
+  { This section may look like this:
+      Raises:
+        EInvalidOperation if bla bla
+          bla bla
+        EMathError if bla bla
+
+    Multiple errors may be separated by new lines. When the new line starts
+    with a capital, it is considered a new error. }
+  Text := GetSectionText(S, SectionStart, Index, SectionEnd).Trim;
+  if (Text <> '') then
+  begin
+    Error := '';
+    Errors := '';
+    Lines := TStringList.Create;
+    try
+      { Split text into multiple lines }
+      Lines.Text := Text;
+      for Line in Lines do
+      begin
+        Trimmed := Line.Trim;
+        if (Trimmed <> '') and (Trimmed.Chars[0] >= 'A') and (Trimmed.Chars[0] <= 'Z') then
+        begin
+          ProcessError;
+          Error := Trimmed;
+        end
+        else if (Error = '') then
+          Error := Trimmed
+        else
+          Error := Error + ' ' + Trimmed;
+      end;
+      ProcessError;
+    finally
+      Lines.Free;
+    end;
+
+    if (Errors <> '') then
+    begin
+      S := S.Remove(SectionStart, SectionEnd - SectionStart + 1);
+      S := S.Insert(SectionStart, Errors);
+    end;
+  end;
+end;
+
 procedure HandleSection(var S: String; const SectionStart, SectionEnd: Integer;
   const Index: Integer);
 var
@@ -334,10 +394,12 @@ begin
   Section := S.Substring(SectionStart, SectionEnd - SectionStart).ToUpper;
   if (Section = 'PARAMETERS') then
     HandleParametersSection(S, SectionStart, Index)
-  else if (Section = 'RETURN') or (Section = 'RETURNS') or (Section = 'RAISES') then
+  else if (Section = 'RETURN') or (Section = 'RETURNS') then
     HandleSimpleSection(S, SectionStart, Index, Section.ToLower)
   else if (Section = 'SEEALSO') then
     HandleSeeAlsoSection(S, SectionStart, Index)
+  else if (Section = 'RAISES') then
+    HandleRaisesSection(S, SectionStart, Index)
 end;
 
 procedure HandleUnorderedList(var S: String; const Index: Integer);
